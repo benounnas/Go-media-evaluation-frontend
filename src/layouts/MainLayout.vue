@@ -15,7 +15,14 @@
           Evaluation App
         </q-toolbar-title>
         <q-space />
-        <q-btn flat dense round icon="logout" aria-label="Menu" />
+        <q-btn
+          @click="logout"
+          flat
+          dense
+          round
+          icon="logout"
+          aria-label="Menu"
+        />
       </q-toolbar>
     </q-header>
 
@@ -26,13 +33,13 @@
       content-class="bg-grey-1"
     >
       <q-list>
-        <q-item clickable v-ripple>
+        <q-item v-ripple>
           <q-item-section avatar>
             <q-avatar>
               <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
             </q-avatar>
           </q-item-section>
-          <q-item-section>Image avatar</q-item-section>
+          <q-item-section>{{ user }}</q-item-section>
         </q-item>
         <q-separator />
         <EssentialLink
@@ -75,6 +82,16 @@ export default {
       leftDrawerOpen: false,
       essentialLinks: linksData
     };
+  },
+  computed: {
+    user() {
+      return this.$store.getters["auth/fullName"];
+    }
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch("auth/logout");
+    }
   }
 };
 </script>

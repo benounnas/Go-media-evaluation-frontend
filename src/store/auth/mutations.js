@@ -3,11 +3,17 @@ export function someMutation (state) {
 }
 */
 import { apiClient } from "../../services/api";
-export function SET_USER(state, user) {
+export function SET_USER_LOGIN(state, data) {
   state.isLoggedIn = true;
-  state.user = user.infos;
-  state.token = user.token;
-  localStorage.setItem("userData", JSON.stringify(user));
+  state.user = data.user;
+  state.token = data.token;
+
+  localStorage.setItem("userData", JSON.stringify(data));
+}
+export function SET_USER_TOKEN(state, data) {
+  state.isLoggedIn = true;
+  state.user = data.user;
+  state.token = data.token;
 }
 export function REGISTER_USER() {}
 export function DISCONNECT_USER() {}

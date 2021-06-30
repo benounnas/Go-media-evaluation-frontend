@@ -1,5 +1,22 @@
+import store from "../store";
+
 const routes = [
   {
+    beforeEnter(to, from, next) {
+      const savedToken = localStorage.getItem("userData");
+      if (!store.state.auth.isLoggedIn || !savedToken) {
+        if (savedToken) {
+          const userJson = JSON.parse(savedToken);
+
+          store.commit("auth/SET_USER_TOKEN", userJson);
+          //try to login with the token or
+
+          next();
+        }
+      } else {
+        next();
+      }
+    },
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [

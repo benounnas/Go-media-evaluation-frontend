@@ -8,12 +8,12 @@ export function login({ commit }, credentials) {
   commit("RESET_ERRORS");
   return AuthentificationService.login(credentials)
     .then(response => {
-      commit("SET_USER", response.data.user);
+      commit("SET_USER_LOGIN", response.data);
       //console.log(response.data);
       router().push("/");
     })
     .catch(e => {
-      //console.log(e);
+      console.log(e);
       commit("SET_ERRORS", e.response.data.message);
     });
 }
@@ -30,5 +30,5 @@ export function logout({ commit }) {
   //location.reload();
 }
 export function loadUser({ commit }, userData) {
-  commit("SET_USER", userData);
+  commit("someMutation", userData);
 }
