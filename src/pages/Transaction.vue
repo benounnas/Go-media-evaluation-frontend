@@ -1,7 +1,6 @@
 <template>
   <div class="q-pa-md">
     <q-table
-      title="Treats"
       :data="data"
       :columns="columns"
       row-key="id"
@@ -44,11 +43,13 @@
           label="Add API"
           @click="editItem()"
         /> -->
-        <h5>API list</h5>
+        <div class="text-h5">Transaction log</div>
+
         <q-space />
         <q-input
-          borderless
+          class="q-ml-md"
           dense
+          placeholder="Search"
           debounce="300"
           color="primary"
           v-model="filter"
@@ -123,6 +124,8 @@
   </div>
 </template>
 <script>
+import { mapActions, mapState } from "vuex";
+
 export default {
   data() {
     return {
@@ -179,77 +182,17 @@ export default {
           label: "Actions",
           field: "actions"
         }*/
-      ],
-      data: [
-        {
-          id: 1,
-          created_at: "2021-06-27T23:36:55.000000Z",
-          updated_at: "2021-06-27T23:36:55.000000Z",
-          action: "api created",
-          api_list_id: 6,
-          user_id: 1,
-          user: {
-            id: 1,
-            first_name: "benounnas",
-            last_name: "oussama",
-            email: "benounnas.oussama@gmail.com",
-            created_at: "2021-06-27T23:33:10.000000Z",
-            updated_at: "2021-06-27T23:33:10.000000Z"
-          }
-        },
-        {
-          id: 2,
-          created_at: "2021-06-27T23:39:02.000000Z",
-          updated_at: "2021-06-27T23:39:02.000000Z",
-          action: "api created",
-          api_list_id: 6,
-          user_id: 1,
-          user: {
-            id: 1,
-            first_name: "benounnas",
-            last_name: "oussama",
-            email: "benounnas.oussama@gmail.com",
-            created_at: "2021-06-27T23:33:10.000000Z",
-            updated_at: "2021-06-27T23:33:10.000000Z"
-          }
-        },
-        {
-          id: 3,
-          created_at: "2021-06-27T23:40:20.000000Z",
-          updated_at: "2021-06-27T23:40:20.000000Z",
-          action: "api deleted",
-          api_list_id: 6,
-          user_id: 1,
-          user: {
-            id: 1,
-            first_name: "benounnas",
-            last_name: "oussama",
-            email: "benounnas.oussama@gmail.com",
-            created_at: "2021-06-27T23:33:10.000000Z",
-            updated_at: "2021-06-27T23:33:10.000000Z"
-          }
-        },
-        {
-          id: 4,
-          created_at: "2021-06-27T23:40:46.000000Z",
-          updated_at: "2021-06-27T23:40:46.000000Z",
-          action: "api deleted",
-          api_list_id: 6,
-          user_id: 1,
-          user: {
-            id: 1,
-            first_name: "benounnas",
-            last_name: "oussama",
-            email: "benounnas.oussama@gmail.com",
-            created_at: "2021-06-27T23:33:10.000000Z",
-            updated_at: "2021-06-27T23:33:10.000000Z"
-          }
-        }
       ]
     };
   },
 
+  created() {
+    this.fetchTransactions();
+  },
   computed: {
+    ...mapState({
+      data: state => state.transaction.logs
+    }),
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     }
@@ -261,6 +204,7 @@ export default {
   },
 
   methods: {
+    ...mapActions("transaction", ["fetchTransactions"]),
     parseDate(date) {
       const formated = new Date(date);
       return `${formated.getDay()}/${formated.getMonth()}/${formated.getFullYear()} at ${formated.getHours()}:${formated.getMinutes()}`;

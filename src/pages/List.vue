@@ -1,7 +1,6 @@
 <template>
   <div class="q-pa-md">
     <q-table
-      title="Treats"
       :data="data"
       :columns="columns"
       row-key="id"
@@ -37,7 +36,10 @@
           </q-td>
         </q-tr>
       </template>
+
       <template v-slot:top>
+        <div class="text-h5">API list</div>
+        <q-space />
         <q-btn
           color="primary"
           :disable="loading"
@@ -45,10 +47,10 @@
           @click="editItem()"
         />
 
-        <q-space />
         <q-input
-          borderless
+          class="q-ml-md"
           dense
+          placeholder="Search"
           debounce="300"
           color="primary"
           v-model="filter"
@@ -66,33 +68,39 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-form @submit="save" @reset="onReset" class="q-gutter-md">
+          <q-form @submit="save" class="q-gutter-md">
             <q-input
               filled
               v-model="editedItem.name"
-              label="API name"
+              label="API name *"
               lazy-rules
               :rules="[
                 val => (val && val.length > 0) || 'Please type something'
               ]"
             />
-
             <q-input
               filled
               v-model="editedItem.url"
-              label="API name"
+              label="API url *"
               lazy-rules
               :rules="[
                 val => (val && val.length > 0) || 'Please type something'
               ]"
             />
+
+            <div>
+              <q-btn label="Submit" type="submit" color="primary" />
+              <q-btn flat label="Cancel" v-close-popup />
+            </div>
           </q-form>
         </q-card-section>
 
+        <!--
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="Save" @click="save" v-close-popup />
+          <q-btn flat label="Save" type="submit" v-close-popup />
         </q-card-actions>
+        -->
       </q-card>
     </q-dialog>
 
@@ -121,6 +129,7 @@
   </div>
 </template>
 <script>
+import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -169,53 +178,14 @@ export default {
           label: "Actions",
           field: "actions"
         }
-      ],
-      data: [
-        {
-          id: 1,
-          name: "gogole",
-          url: "https://google.com/",
-          active: 1,
-          created_at: "2021-06-27T23:33:43.000000Z",
-          updated_at: "2021-06-27T23:33:43.000000Z"
-        },
-        {
-          id: 2,
-          name: "oussama",
-          url: "https://google.com/",
-          active: 1,
-          created_at: "2021-06-27T23:34:34.000000Z",
-          updated_at: "2021-06-27T23:34:34.000000Z"
-        },
-        {
-          id: 3,
-          name: "gogole",
-          url: "https://google.com/",
-          active: 1,
-          created_at: "2021-06-27T23:35:09.000000Z",
-          updated_at: "2021-06-27T23:35:09.000000Z"
-        },
-        {
-          id: 4,
-          name: "gogole",
-          url: "https://google.com/",
-          active: 1,
-          created_at: "2021-06-27T23:35:37.000000Z",
-          updated_at: "2021-06-27T23:35:37.000000Z"
-        },
-        {
-          id: 5,
-          name: "gogole",
-          url: "https://google.com/",
-          active: 1,
-          created_at: "2021-06-27T23:36:23.000000Z",
-          updated_at: "2021-06-27T23:36:23.000000Z"
-        }
       ]
     };
   },
 
   computed: {
+    ...mapState({
+      data: state => state.apilist.apilist
+    }),
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     }
@@ -225,8 +195,21 @@ export default {
       val || this.close();
     }
   },
+  created() {
+    this.init();
+  },
 
   methods: {
+    ...mapActions("apilist", [
+      "deleteApilist",
+      "fetchApilist",
+      "createApilist",
+      "updateApilist"
+    ]),
+
+    init() {
+      this.fetchApilist();
+    },
     close() {
       this.dialog = false;
       this.$nextTick(() => {
@@ -241,9 +224,30 @@ export default {
     },
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.data[this.editedIndex], this.editedItem);
+        //statically
+        // Object.assign(this.data[this.editedIndex], this.editedItem);
+        //
+        /**Dynamically */
+        this.updateApilist({
+          apilist: this.editedItem,
+          index: this.editedIndex
+        }).then(() => {
+          this.$q.notify({
+            message: "Updated successfully",
+            icon: "thumb_up",
+            color: "teal"
+          });
+        });
       } else {
-        this.data.push(this.editedItem);
+        //statically
+        // this.data.push(this.editedItem);
+        this.createApilist({ apilist: this.editedItem }).then(() => {
+          this.$q.notify({
+            message: "Created successfully",
+            icon: "thumb_up",
+            color: "teal"
+          });
+        });
       }
       this.close();
     },
@@ -254,7 +258,20 @@ export default {
     },
 
     deleteItemConfirm() {
-      this.data.splice(this.editedIndex, 1);
+      //statically
+      // this.data.splice(this.editedIndex, 1);
+      /** Dynamically **/
+      this.deleteApilist({
+        apilist: this.editedItem,
+        index: this.editedIndex
+      }).then(() =>
+        this.$q.notify({
+          message: "Deleted!",
+          icon: "thumb_up",
+          color: "teal"
+        })
+      );
+      /** */
       this.closeDelete();
     },
     closeDelete() {
